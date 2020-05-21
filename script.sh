@@ -5,7 +5,7 @@
 
 # add script to crontab to run every 15 minutes:
 # $ crontab -e
-# */15 * * * * helen /home/helen/projects/weather_scrapper/script.sh
+# */15 * * * * /home/helen/projects/weather_scrapper/script.sh
 
 # sources the virtual environment needed to run the program
 source /home/helen/projects/weather_scrapper/venv/bin/activate
