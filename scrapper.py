@@ -54,18 +54,18 @@ def gather_information():
 
     # converts data into data frame
     df = pd.DataFrame(data)
-    print(df)
+    # print(df)
 
     # sees if there's previous data and append, otherwise move on
     if old_data.empty:
         old_data = df
-        print('empty')
+        # print('empty')
     else:
         old_data = old_data.append(df, ignore_index=True)
-        print('not empty')
+        # print('not empty')
 
     # stores into pickle file
-    print(old_data)
+    # print(old_data)
     old_data.to_pickle('./weather_data.pickle')
 
 

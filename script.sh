@@ -4,13 +4,13 @@
 # @sonbyj01
 
 # sources the virtual environment needed to run the program
-source /home/helen/projects/weather_scrapping/venv/bin/activate
+source /home/helen/projects/weather_scrapper/venv/bin/activate
 
 # turns to executable
-chmod +x /home/helen/projects/weather_scrapping/scrapper.py
+chmod +x /home/helen/projects/weather_scrapper/scrapper.py
 
 # runs the program
-/home/helen/projects/weather_scrapping/scrapper.py
+/home/helen/projects/weather_scrapper/scrapper.py
 
 # deactivates the virtual environment
 deactivate
