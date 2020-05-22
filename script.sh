@@ -10,6 +10,9 @@
 # sources the virtual environment needed to run the program
 source /home/helen/projects/weather_scrapper/venv/bin/activate
 
+# moves into project directory
+cd /home/helen/projects/weather_scrapper
+
 # turns to executable
 chmod +x /home/helen/projects/weather_scrapper/scrapper.py
 
