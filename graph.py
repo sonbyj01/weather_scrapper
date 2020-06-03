@@ -85,6 +85,7 @@ fig.update_layout(
 )
 
 fig.show()
+plotly.offline.plot(fig, auto_open=False, show_link=False)
 
 # ---------------------------------------------
 
