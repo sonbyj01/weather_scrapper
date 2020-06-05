@@ -22,7 +22,23 @@ $ pip3 install -r requirements.txt
 URL = "https://www.wunderground.com/weather/us/ny/manhasset/11030" (line 12)
 ```
 Change this to the URL that you want to get data from. 
-
+```python3
+MONGODB_URL = 'mongodb://{{IP ADDRESS || HOST NAME}}:{{PORT}}/'
+MONGODB_DATABASE = 'weather_scrapping'
+MONGODB_COLLECTION = 'data'
+POSTGRES_URL = 'postgresql://{{USERNAME}}:{{PASSWORD}}!@{{IP ADDRESS || HOST NAME}}:{{PORT}/{{DATABASE}}'
+POSTGRES_TABLE = 'data'
+```
+Update the MongoDB and/or Postgres urls if you want to save the data to a database.
+```python3
+STORING_METHOD = {
+    'Pickle': False,
+    'MongoDB': True,
+    'Postgres': False
+}
+```
+Pick which saving method you want to perform.
+ 
 **script.sh**: Change the absolute paths if you want to run this script using crontab. 
 
 ## Running the program 
@@ -48,3 +64,5 @@ $ ./graph.py
 # As python3 script
 $ python3 graph.py
 ```
+
+I will get around to pulling and graphing data points from databases eventually...
