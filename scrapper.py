@@ -4,21 +4,80 @@
 # @sonbyj01
 
 from datetime import datetime
-import requests
-# import time
-import pandas as pd
 from bs4 import BeautifulSoup
+import sqlalchemy
+import requests
+import pandas as pd
+import pymongo
 
+# URL of specific location where data will be pulled from
 URL = "https://www.wunderground.com/weather/us/ny/manhasset/11030"
 
+# "database_dialect://user:password@host/database"
+MONGODB_URL = 'mongodb://{{IP ADDRESS || HOST NAME}}:{{PORT}}/'
+MONGODB_DATABASE = 'weather_scrapping'
+MONGODB_COLLECTION = 'data'
+POSTGRES_URL = 'postgresql://{{USERNAME}}:{{PASSWORD}}!@{{IP ADDRESS || HOST NAME}}:{{PORT}/{{DATABASE}}'
+POSTGRES_TABLE = 'data'
 
-def gather_information():
+# specify storing method based on individual case
+STORING_METHOD = {
+    'Pickle': False,
+    'MongoDB': True,
+    'Postgres': False
+}
+
+
+# https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.to_dict.html
+# https://www.datasciencelearner.com/insert-pandas-dataframe-into-mongodb/
+def _to_mongodb(df):
+    client = pymongo.MongoClient(MONGODB_URL)
+    db = client[MONGODB_DATABASE]
+    collection = db[MONGODB_COLLECTION]
+
+    df_dict = df.to_dict('records')
+    collection.insert_one(df_dict[0])
+
+
+# https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.DataFrame.to_sql.html
+# http://www.jan-langfellner.de/storing-a-pandas-dataframe-in-a-postgresql-database/
+def _to_postgres(df):
+    engine = sqlalchemy.create_engine(POSTGRES_URL)
+    con = engine.connect()
+    df.to_sql(POSTGRES_TABLE, con, if_exists='append')
+    con.close()
+    return
+
+
+def _to_pickle_file(df):
     # first checks if there's existing pickle file
     try:
         old_data = pd.read_pickle('./weather_data.pickle')
     except FileNotFoundError as fnf:
         old_data = pd.DataFrame()
 
+    # sees if there's previous data and append, otherwise move on
+    if old_data.empty:
+        old_data = df
+    else:
+        old_data = old_data.append(df, ignore_index=True)
+
+    # stores into pickle file
+    old_data.to_pickle('./weather_data.pickle')
+    return
+
+
+def store_information(df):
+    if STORING_METHOD.get('Pickle'):
+        _to_pickle_file(df)
+    if STORING_METHOD.get('MongoDB'):
+        _to_mongodb(df)
+    if STORING_METHOD.get('Postgres'):
+        _to_postgres(df)
+    return
+
+
+def gather_information():
     # requests for the web page
     response = requests.get(URL)
     soup = BeautifulSoup(response.text, 'html.parser')
@@ -49,31 +108,14 @@ def gather_information():
         temp_results = soup.find('span', class_=additional_information[info])
         temp = str(temp_results.contents[3].contents[0])
         data[info] = [temp]
-        # print(data)
-        # print('{}: {}'.format(info, temp))
 
     # converts data into data frame
-    df = pd.DataFrame(data)
-    # print(df)
-
-    # sees if there's previous data and append, otherwise move on
-    if old_data.empty:
-        old_data = df
-        # print('empty')
-    else:
-        old_data = old_data.append(df, ignore_index=True)
-        # print('not empty')
-
-    # stores into pickle file
-    # print(old_data)
-    old_data.to_pickle('./weather_data.pickle')
+    store_information(pd.DataFrame(data))
+    return
 
 
 def main():
     gather_information()
-    # while True:
-    #     gather_information()
-    #     time.sleep(900)         # 15 minutes
 
 
 if __name__ == "__main__":
